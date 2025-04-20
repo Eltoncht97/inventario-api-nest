@@ -26,6 +26,12 @@ enum Status {
   inactivo
 }
 
+enum DocumentType {
+  DNI
+  CUIT
+  CUIL
+}
+
 model Category {
   id     String @id @default(uuid())
   name   String @unique
@@ -34,7 +40,6 @@ model Category {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  deleted   Boolean   @default(false)
 
   products Product[]
 }
@@ -60,8 +65,24 @@ model Product {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  deleted   Boolean   @default(false)
 
   Category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
+}
+
+model Customer {
+  id           String       @id @default(uuid())
+  name         String
+  lastName1    String
+  lastName2    String
+  document     String       @unique
+  documentType DocumentType @default(DNI)
+  email        String?      @unique
+  phone        String
+  address      String
+  status       Status       @default(activo)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }

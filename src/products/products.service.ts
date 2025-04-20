@@ -56,7 +56,7 @@ export class ProductsService {
       const skip = (page - 1) * limit;
 
       const filters: Prisma.ProductWhereInput = {
-        deleted: false,
+        deletedAt: null,
         ...(categoryId ? { categoryId } : {}),
         ...(status ? { status } : {}),
       };
@@ -138,7 +138,6 @@ export class ProductsService {
       const product = await this.prisma.product.update({
         where: { id },
         data: {
-          deleted: true,
           deletedAt: new Date(),
         },
       });

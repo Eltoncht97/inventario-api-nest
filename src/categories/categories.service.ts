@@ -34,7 +34,7 @@ export class CategoriesService {
       const skip = (page - 1) * limit;
 
       const filters: Prisma.CategoryWhereInput = {
-        deleted: false,
+        deletedAt: null,
         ...(status ? { status } : {}),
       };
 
@@ -106,7 +106,6 @@ export class CategoriesService {
       const category = await this.prisma.category.update({
         where: { id },
         data: {
-          deleted: true,
           deletedAt: new Date(),
         },
       });
