@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum IvaType {
+  IVA_0
+  IVA_10
+  IVA_21
+  IVA_27
+}
+
+enum Status {
+  activo
+  inactivo
+}
+
+model Category {
+  id     String @id @default(uuid())
+  name   String @unique
+  status Status @default(activo)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  deleted   Boolean   @default(false)
+
+  products Product[]
+}
+
+model Product {
+  id               String  @id @default(uuid())
+  code             String  @unique
+  name             String
+  description      String
+  stock            Int     @default(0)
+  stockMin         Int     @default(0)
+  cost             Float
+  ivaType          IvaType @default(IVA_21)
+  ivaValue         Float
+  costTotal        Float
+  discountPercent  Float   @default(0)
+  discountValue    Float   @default(0)
+  utilitiesPercent Float   @default(0)
+  utilitiesValue   Float   @default(0)
+  price            Float
+  status           Status  @default(activo)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  deleted   Boolean   @default(false)
+
+  Category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+}
