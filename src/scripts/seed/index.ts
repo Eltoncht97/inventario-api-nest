@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { seedCategories } from './category.seed';
 import { seedProducts } from './product.seed';
+import { seedCustomers } from './customer.seed';
 
 const prisma = new PrismaClient();
 
@@ -10,6 +11,7 @@ async function main() {
   // Ejecutar cada seed de forma controlada
   const categories = await seedCategories(prisma);
   await seedProducts(prisma, categories);
+  await seedCustomers(prisma);
 
   console.log('✅ Seed finalizado con éxito');
 }

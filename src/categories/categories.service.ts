@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -110,7 +115,7 @@ export class CategoriesService {
         },
       });
       return {
-        message: `Categoría ${id} eliminada satisfactoriamente`,
+        message: `Categoría eliminada satisfactoriamente`,
         data: category,
       };
     } catch (error) {
@@ -122,6 +127,12 @@ export class CategoriesService {
   async toggleStatus(id: string) {
     try {
       const category = await this.findOne(id); // ya valida existencia
+
+      if (category.deletedAt) {
+        throw new BadRequestException(
+          'La categoría fue eliminada y no se puede modificar',
+        );
+      }
 
       const newStatus = category.status === 'activo' ? 'inactivo' : 'activo';
 
