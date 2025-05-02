@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { Prisma } from '@prisma/client';
 import { calculatePricing } from './helpers/calculate-pricing';
+import { AdjustPricesDto } from './dto/adjust-prices.dto';
 
 @Injectable()
 export class ProductsService {
@@ -214,5 +215,49 @@ export class ProductsService {
       this.logger.error(`Error al cambiar estado del producto ${id}`, error);
       throw error;
     }
+  }
+
+  async adjustPrices(dto: AdjustPricesDto) {
+    const { percentToAdd, categoryId } = dto;
+
+    const whereClause = categoryId ? { categoryId } : {};
+
+    const products = await this.prisma.product.findMany({ where: whereClause });
+
+    const operations = products.map((product) => {
+      const updatedUtilitiesPercent = product.utilitiesPercent + percentToAdd;
+
+      const {
+        ivaValue,
+        utilitiesValue,
+        discountPercent,
+        discountValue,
+        price,
+        costTotal,
+      } = calculatePricing({
+        ...product,
+        utilitiesPercent: updatedUtilitiesPercent,
+      });
+
+      return this.prisma.product.update({
+        where: { id: product.id },
+        data: {
+          utilitiesPercent: updatedUtilitiesPercent,
+          utilitiesValue,
+          ivaValue,
+          discountPercent,
+          discountValue,
+          price,
+          costTotal,
+        },
+      });
+    });
+
+    const result = await this.prisma.$transaction(operations);
+
+    return {
+      message: 'Precios actualizados con éxito',
+      count: result.length,
+    };
   }
 }

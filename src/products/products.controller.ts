@@ -13,6 +13,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { AdjustPricesDto } from './dto/adjust-prices.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -49,5 +50,10 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
+  }
+
+  @Patch('adjust-prices')
+  async adjustPrices(@Body() dto: AdjustPricesDto) {
+    return this.productsService.adjustPrices(dto);
   }
 }
