@@ -9,6 +9,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { Prisma } from '@prisma/client';
+import { calculatePricing } from './helpers/calculate-pricing';
 
 @Injectable()
 export class ProductsService {
@@ -29,11 +30,28 @@ export class ProductsService {
         throw new BadRequestException('La categoría proporcionada no existe');
       }
 
-      // 🧠 Aquí podrías agregar otras validaciones si las necesitás (por ejemplo: stock, códigos internos, reglas empresariales, etc.)
+      const {
+        costTotal,
+        ivaValue,
+        utilitiesValue,
+        utilitiesPercent,
+        discountValue,
+        discountPercent,
+        price,
+      } = calculatePricing(createProductDto);
 
       // ✅ Crear el producto
       const product = await this.prisma.product.create({
-        data: createProductDto,
+        data: {
+          ...createProductDto,
+          costTotal,
+          ivaValue,
+          utilitiesValue,
+          utilitiesPercent,
+          discountValue,
+          discountPercent,
+          price,
+        },
       });
 
       return {
@@ -103,7 +121,7 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    await this.findOne(id);
+    const productDb = await this.findOne(id);
 
     try {
       if (updateProductDto.categoryId) {
@@ -115,11 +133,31 @@ export class ProductsService {
         }
       }
 
+      const shouldRecalculatePrice =
+        'cost' in updateProductDto ||
+        'ivaType' in updateProductDto ||
+        'utilitiesPercent' in updateProductDto ||
+        'utilitiesValue' in updateProductDto ||
+        'discountPercent' in updateProductDto ||
+        'discountValue' in updateProductDto;
+
+      let pricingData = {};
+
+      if (shouldRecalculatePrice) {
+        pricingData = calculatePricing({
+          ...productDb,
+          ...updateProductDto,
+        });
+      }
+
       const product = await this.prisma.product.update({
         where: {
           id,
         },
-        data: updateProductDto,
+        data: {
+          ...updateProductDto,
+          ...pricingData,
+        },
       });
 
       return {
@@ -142,7 +180,7 @@ export class ProductsService {
         },
       });
       return {
-        message: `Producto ${id} eliminado satisfactoriamente`,
+        message: `Producto eliminado satisfactoriamente`,
         data: product,
       };
     } catch (error) {
@@ -154,6 +192,12 @@ export class ProductsService {
   async toggleStatus(id: string) {
     try {
       const product = await this.findOne(id); // ya valida existencia
+
+      if (product.deletedAt) {
+        throw new BadRequestException(
+          'El producto fue eliminado y no se puede modificar',
+        );
+      }
 
       const newStatus = product.status === 'activo' ? 'inactivo' : 'activo';
 

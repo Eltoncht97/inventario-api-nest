@@ -38,42 +38,31 @@ export class CreateProductDto {
   @IsEnum(IvaType)
   ivaType: IvaType;
 
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  ivaValue: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  costTotal: number;
-
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   @Max(100)
-  discountPercent: number;
+  utilitiesPercent?: number;
 
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  discountValue: number;
+  utilitiesValue?: number;
 
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   @Max(100)
-  utilitiesPercent: number;
+  discountPercent?: number;
 
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  utilitiesValue: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  price: number;
+  discountValue?: number;
 
   @IsUUID()
   categoryId: string;
