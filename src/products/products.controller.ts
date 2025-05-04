@@ -14,7 +14,9 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { AdjustPricesDto } from './dto/adjust-prices.dto';
+import { Auth } from 'src/common/decorators';
 
+@Auth()
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -34,6 +36,11 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
+  @Patch('adjust-prices')
+  async adjustPrices(@Body() dto: AdjustPricesDto) {
+    return this.productsService.adjustPrices(dto);
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -50,10 +57,5 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
-  }
-
-  @Patch('adjust-prices')
-  async adjustPrices(@Body() dto: AdjustPricesDto) {
-    return this.productsService.adjustPrices(dto);
   }
 }

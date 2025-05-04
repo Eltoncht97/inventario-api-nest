@@ -62,8 +62,6 @@ export class ProductsService {
     } catch (error) {
       this.logger.error('Error en la creación de producto', error);
 
-      // ✨ Si el error es de Prisma, el filtro global lo atrapará
-      // Aquí podrías filtrar si querés hacer algo especial para errores de lógica
       throw error;
     }
   }

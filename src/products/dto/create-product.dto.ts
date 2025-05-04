@@ -7,7 +7,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IvaType, Status } from 'src/common/constants';
 
 export class CreateProductDto {
@@ -30,6 +30,7 @@ export class CreateProductDto {
   @Min(0)
   stockMin: number;
 
+  @Transform(({ value }) => +Number(value).toFixed(2))
   @Type(() => Number)
   @IsNumber()
   @Min(0)
@@ -39,6 +40,7 @@ export class CreateProductDto {
   ivaType: IvaType;
 
   @IsOptional()
+  @Transform(({ value }) => +Number(value).toFixed(2))
   @Type(() => Number)
   @IsNumber()
   @Min(0)
@@ -46,12 +48,14 @@ export class CreateProductDto {
   utilitiesPercent?: number;
 
   @IsOptional()
+  @Transform(({ value }) => +Number(value).toFixed(2))
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   utilitiesValue?: number;
 
   @IsOptional()
+  @Transform(({ value }) => +Number(value).toFixed(2))
   @Type(() => Number)
   @IsNumber()
   @Min(0)
@@ -59,6 +63,7 @@ export class CreateProductDto {
   discountPercent?: number;
 
   @IsOptional()
+  @Transform(({ value }) => +Number(value).toFixed(2))
   @Type(() => Number)
   @IsNumber()
   @Min(0)

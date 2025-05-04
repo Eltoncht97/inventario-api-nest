@@ -1,6 +1,7 @@
 import { IvaType as CustomIvaType } from 'src/common/constants';
 
 import { IvaType } from '@prisma/client';
+import { round2 } from 'src/helpers';
 
 const IVA_MAP: Record<IvaType, number> = {
   IVA_0: 0,
@@ -32,17 +33,17 @@ export function calculatePricing(input: PricingInput) {
   }
 
   const ivaRate = IVA_MAP[ivaType];
-  const ivaValue = cost * ivaRate;
+  const ivaValue = round2(cost * ivaRate);
 
-  const costTotal = cost + ivaValue;
+  const costTotal = round2(cost + ivaValue);
 
   let utilitiesPercent = input.utilitiesPercent;
   let utilitiesValue = input.utilitiesValue;
 
   if (utilitiesPercent !== undefined) {
-    utilitiesValue = cost * (utilitiesPercent / 100);
+    utilitiesValue = round2(cost * (utilitiesPercent / 100));
   } else if (utilitiesValue !== undefined) {
-    utilitiesPercent = (utilitiesValue / cost) * 100;
+    utilitiesPercent = round2((utilitiesValue / cost) * 100);
   } else {
     utilitiesPercent = 0;
     utilitiesValue = 0;
@@ -52,15 +53,15 @@ export function calculatePricing(input: PricingInput) {
   let discountValue = input.discountValue;
 
   if (discountPercent !== undefined) {
-    discountValue = cost * (discountPercent / 100);
+    discountValue = round2(cost * (discountPercent / 100));
   } else if (discountValue !== undefined) {
-    discountPercent = (discountValue / cost) * 100;
+    discountPercent = round2((discountValue / cost) * 100);
   } else {
     discountPercent = 0;
     discountValue = 0;
   }
 
-  const price = cost + ivaValue + utilitiesValue - discountValue;
+  const price = round2(cost + ivaValue + utilitiesValue - discountValue);
 
   return {
     costTotal,

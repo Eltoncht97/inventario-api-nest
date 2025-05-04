@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { seedCategories } from './category.seed';
 import { seedProducts } from './product.seed';
 import { seedCustomers } from './customer.seed';
+import { seedUsers } from './user.seed';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,8 @@ async function main() {
   await seedProducts(prisma, categories);
   await seedCustomers(prisma);
 
+  await seedUsers();
+
   console.log('✅ Seed finalizado con éxito');
 }
 
@@ -23,5 +26,5 @@ main()
   })
   .finally(() => {
     // ❗ sin async acá para evitar error de eslint
-    prisma.$disconnect();
+    void prisma.$disconnect();
   });

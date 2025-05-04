@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch()
+@Catch(HttpException)
 export class HttpGlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -16,6 +16,8 @@ export class HttpGlobalExceptionFilter implements ExceptionFilter {
     const timestamp = new Date().toISOString();
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Ha ocurrido un error inesperado';
+
+    console.log('Entra al http Exception');
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -26,8 +28,12 @@ export class HttpGlobalExceptionFilter implements ExceptionFilter {
         message = responseBody;
       } else if (typeof responseBody === 'object' && responseBody !== null) {
         const res = responseBody as Record<string, any>;
-        if ('message' in res && typeof res.message === 'string') {
-          message = res.message;
+        if ('message' in res) {
+          if (Array.isArray(res.message)) {
+            message = res.message.join(', ');
+          } else if (typeof res.message === 'string') {
+            message = res.message;
+          }
         } else if ('error' in res && typeof res.error === 'string') {
           message = res.error;
         }
