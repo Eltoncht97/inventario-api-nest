@@ -6,13 +6,14 @@ import {
   Patch,
   Param,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { Role } from 'src/common/constants';
+import { FilterUserDto } from './dto/filter-user.dto';
 
 @Auth(Role.ADMIN)
 @Controller('users')
@@ -25,9 +26,13 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: any) {
-    console.log('Usuario autenticado:', user);
-    return this.usersService.findAll();
+  findAll(@Query() filterDto: FilterUserDto) {
+    return this.usersService.findAll(filterDto);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')

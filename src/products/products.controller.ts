@@ -15,6 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { AdjustPricesDto } from './dto/adjust-prices.dto';
 import { Auth } from 'src/common/decorators';
+import { Role } from 'src/common/constants';
 
 @Auth()
 @Controller('products')
@@ -36,6 +37,7 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
+  @Auth(Role.ADMIN)
   @Patch('adjust-prices')
   async adjustPrices(@Body() dto: AdjustPricesDto) {
     return this.productsService.adjustPrices(dto);
