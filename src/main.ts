@@ -1,15 +1,19 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
-import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
-import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
-import { HttpGlobalExceptionFilter } from './common/interceptors/http-exception.filter';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { Logger, ValidationPipe } from "@nestjs/common";
+import { PrismaExceptionFilter } from "./common/filters/prisma-exception.filter";
+import { TransformResponseInterceptor } from "./common/interceptors/transform-response.interceptor";
+import { HttpGlobalExceptionFilter } from "./common/interceptors/http-exception.filter";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { setupSwagger } from "./config/swagger.config";
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
+  const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+  setupSwagger(app)
+
+  app.setGlobalPrefix("api");
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
